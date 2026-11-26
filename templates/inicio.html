@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block refresh %}<meta http-equiv="refresh" content="30">{% endblock %}
+{% block conteudo %}
+{% macro cor_oee(v) %}{{ 'var(--fraco)' if v is none else ('var(--verde)' if v >= 0.85 else ('var(--amarelo)' if v >= 0.65 else 'var(--vermelho)')) }}{% endmacro %}
+<div class="topo">
+  <div><h1>Máquinas</h1><div class="sub">Últimas 8 horas · atualiza sozinho a cada 30 s</div></div>
+</div>
+
+<div class="kpis">
+  <div class="cartao kpi"><div class="rot">Rodando agora</div><div class="val" style="color:var(--verde)">{{ resumo.rodando }}<small> / {{ resumo.total }}</small></div></div>
+  <div class="cartao kpi"><div class="rot">Paradas agora</div><div class="val" style="color:{{ 'var(--vermelho)' if resumo.paradas else 'var(--texto)' }}">{{ resumo.paradas }}</div></div>
+  <div class="cartao kpi"><div class="rot">Alertas abertos</div><div class="val" style="color:{{ 'var(--amarelo)' if resumo.alertas else 'var(--texto)' }}">{{ resumo.alertas }}</div></div>
+  <div class="cartao kpi"><div class="rot">OEE médio</div><div class="val" style="color:{{ cor_oee(resumo.oee) }}">{{ resumo.oee|pct }}</div></div>
+  <div class="cartao kpi"><div class="rot">Peças produzidas</div><div class="val">{{ '{:,}'.format(resumo.pecas).replace(',', '.') }}</div></div>
+</div>
+
+<h2>Por máquina</h2>
+<div class="grade">
+  {% for l in linhas %}
+  <div class="cartao">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+      <div><strong style="font-size:16px">{{ l.m.nome }}</strong><div class="fraco">{{ l.m.tipo }}</div></div>
+      <span class="selo {{ l.estado|replace(' ', '') }}">{{ l.estado }}</span>
+    </div>
+    <div style="display:flex;align-items:baseline;gap:8px;margin:14px 0 10px">
+      <span style="font-size:32px;font-weight:700;color:{{ cor_oee(l.ind.oee) }}">{{ l.ind.oee|pct }}</span><span class="fraco">OEE</span>
+    </div>
+    <div class="faixa" title="Linha do tempo das últimas 8 h">
+      {% for f in l.faixa %}<span class="t-{{ f.tipo }}" style="left:{{ f.x }}%;width:{{ f.w }}%"></span>{% endfor %}
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:10px" class="fraco">
+      <span>{{ l.ind.pecas }} peças</span><span>Disp. {{ l.ind.disponibilidade|pct }}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px">
+      <span>{% if l.alertas %}<span class="selo aviso">{{ l.alertas }} alerta{{ 's' if l.alertas > 1 }}</span>{% endif %}</span>
+      <span>
+        {% if usuario.perfil in ('gestor', 'admin') %}<a href="{{ url_for('painel', mid=l.m.id) }}">Painel →</a>{% endif %}
+        {% if usuario.perfil == 'operador' %}<a href="{{ url_for('operador', mid=l.m.id) }}">Apontar →</a>{% endif %}
+      </span>
+    </div>
+  </div>
+  {% else %}
+  <p class="fraco">Nenhuma máquina cadastrada.</p>
+  {% endfor %}
+</div>
+<div class="legenda"><span><i style="background:var(--verde)"></i>Rodando</span><span><i class="t-naoplanejada"></i>Parada não planejada</span><span><i class="t-planejada"></i>Parada planejada</span><span><i class="t-semmotivo"></i>Parada sem motivo</span></div>
+{% endblock %}
