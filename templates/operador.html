@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block titulo %}{{ m.nome }} · Operador{% endblock %}
+{% block conteudo %}
+<style>
+  .motivos { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:14px; }
+  .motivos button { padding:14px 10px; font-size:15px; line-height:1.25; }
+  .motivos button.sec { font-weight:600; }
+</style>
+<div class="topo">
+  <div>
+    <h1>{{ m.nome }} {% if ultima %}<span class="selo {{ ultima.estado }}" style="vertical-align:middle">{{ ultima.estado }}</span>{% endif %}</h1>
+    <div class="sub">{{ m.tipo }} · {{ pendentes|length }} parada{{ 's' if pendentes|length != 1 }} esperando motivo</div>
+  </div>
+</div>
+
+{% for p in pendentes %}
+<div class="cartao" style="margin-bottom:12px;{{ 'border-color:rgba(248,113,113,.6)' if not p.fim }}">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+    <strong>Parou às {{ p.inicio|hora }}</strong>
+    {% if not p.fim %}<span class="selo parada">há {{ p.inicio|minutos_desde|duracao }}</span>
+    {% else %}<span class="fraco">durou {{ ((p.fim|minutos_desde) - (p.inicio|minutos_desde))|abs|duracao }}</span>{% endif %}
+  </div>
+  <form method="post" action="{{ url_for('informar_motivo', mid=m.id) }}">
+    <input type="hidden" name="parada_id" value="{{ p.id }}">
+    <div class="motivos">
+      {% for mo in motivos %}
+      <button type="submit" name="motivo_id" value="{{ mo.id }}" class="{{ '' if mo.planejada else 'sec' }}">{{ mo.descricao }}</button>
+      {% endfor %}
+    </div>
+  </form>
+</div>
+{% else %}
+<div class="cartao" style="text-align:center;padding:28px">
+  <div style="font-size:34px">✓</div>
+  <strong>Nenhuma parada esperando motivo</strong>
+  <p class="fraco">Quando a máquina parar, a parada aparece aqui sozinha.</p>
+</div>
+{% endfor %}
+
+<h2>Apontar refugo</h2>
+<form method="post" action="{{ url_for('apontar_refugo', mid=m.id) }}" class="cartao">
+  <label for="quantidade" style="margin-top:0">Peças refugadas</label>
+  <div style="display:flex;gap:8px">
+    <input id="quantidade" name="quantidade" type="number" min="1" step="1" required inputmode="numeric" placeholder="0">
+    <button type="submit" style="white-space:nowrap">Registrar</button>
+  </div>
+</form>
+<p class="fraco">Botões laranja = paradas planejadas (não contam contra a disponibilidade).</p>
+{% endblock %}
