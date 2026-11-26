@@ -1,0 +1,13 @@
+# Banco gerado localmente (python app.py init)
+*.db
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# Sistema
+.DS_Store
+Thumbs.db
