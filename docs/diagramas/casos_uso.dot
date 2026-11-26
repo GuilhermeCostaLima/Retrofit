@@ -1,0 +1,29 @@
+graph UC {
+  layout=neato; splines=false; bgcolor="white"; pad=0.4; outputorder=nodesfirst;
+  node [fontname="Helvetica", fontsize=13]; edge [fontname="Helvetica", fontsize=11, color="#333333", penwidth=1.3];
+  titulo [shape=plaintext, label="Diagrama de Casos de Uso — Retrofit", fontsize=17, pos="5.2,9.2!"];
+  sistema [shape=box, style="rounded", color="#555555", penwidth=1.5, label="Sistema Retrofit (plataforma web)", labelloc=t, fontsize=14,
+           width=6.6, height=8.9, pos="5.1,4.15!"];
+  node [shape=none, image="ator.png", imagescale=false, labelloc=b, width=1.3, height=1.4, fixedsize=true];
+  admin [label="Administrador", pos="0,7.0!"];
+  gestor [label="Gestor", pos="0,4.2!"];
+  operador [label="Operador", pos="0,0.9!"];
+  peca [label="Peça Retrofit\n(sistema externo)", width=1.8, pos="10.4,6.1!"];
+  node [shape=ellipse, image="", width=2.6, height=0.7, fixedsize=true, style=filled, fillcolor="#fff4e8", color="#c25e10", labelloc=c];
+  uc02 [label="UC02 Manter usuários", pos="3.4,7.7!"];
+  uc03 [label="UC03 Manter máquinas\n(token e QR code)", pos="3.4,6.6!"];
+  uc04 [label="UC04 Enviar leitura", pos="7.0,6.1!"];
+  uc07 [label="UC07 Consultar painel\nda máquina", pos="3.4,4.7!"];
+  uc08 [label="UC08 Resolver alerta", pos="7.0,4.7!"];
+  uc01 [label="UC01 Fazer login", pos="3.4,3.1!"];
+  uc05 [label="UC05 Informar motivo\nda parada", pos="3.4,1.5!"];
+  uc06 [label="UC06 Apontar refugo", pos="3.4,0.4!"];
+  admin -- uc02; admin -- uc03;
+  gestor -- uc07; gestor -- uc01;
+  operador -- uc01; operador -- uc05; operador -- uc06;
+  peca -- uc04;
+  admin -- gestor [dir=forward, arrowhead=empty, arrowsize=1.4, xlabel="herda de", headclip=true];
+  uc05 -- uc01 [style=dashed, dir=forward, arrowhead=vee, xlabel="«include»"];
+  uc08 -- uc07 [style=dashed, dir=forward, arrowhead=vee];
+  ext [shape=plaintext, label="«extend»", fontsize=11, style="", image="", width=0.8, height=0.3, pos="5.2,4.95!"];
+}
