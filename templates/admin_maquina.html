@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block titulo %}{{ m.nome }} · Cadastro{% endblock %}
+{% block conteudo %}
+<div class="topo">
+  <div><h1>{{ m.nome }} <span class="selo {{ 'rodando' if m.ativa else 'semsinal' }}" style="vertical-align:middle">{{ 'ativa' if m.ativa else 'inativa' }}</span></h1>
+  <div class="sub"><a href="{{ url_for('admin_maquinas') }}">← Cadastro de máquinas</a></div></div>
+</div>
+<div class="grade" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+  <form method="post" class="cartao">
+    <strong>Dados da máquina</strong>
+    <label for="nome">Nome</label><input id="nome" name="nome" value="{{ m.nome }}" required>
+    <label for="tipo">Tipo</label><input id="tipo" name="tipo" value="{{ m.tipo }}" required>
+    <label for="ciclo">Tempo de ciclo padrão (s)</label><input id="ciclo" name="ciclo_padrao_seg" type="number" step="0.1" value="{{ m.ciclo_padrao_seg }}" required>
+    <label for="tmax">Temperatura máxima (°C)</label><input id="tmax" name="temp_max" type="number" step="0.1" value="{{ m.temp_max if m.temp_max is not none }}">
+    <p style="margin-bottom:0;display:flex;gap:8px"><button type="submit">Salvar</button>
+       <button type="submit" name="acao" value="ativa" class="sec">{{ 'Desativar' if m.ativa else 'Ativar' }}</button></p>
+  </form>
+  <div class="cartao" style="text-align:center">
+    <strong>QR code para colar na máquina</strong>
+    <div style="background:#fff;border-radius:12px;padding:12px;display:inline-block;margin:14px 0">
+      <img src="{{ url_for('qr_maquina', mid=m.id) }}" alt="QR code da máquina" width="190" height="190">
+    </div>
+    <p class="fraco" style="margin-top:0">Abre a tela do operador: {{ link_qr }}</p>
+    <label style="text-align:left">Token da peça (configurar no Retrofit)</label>
+    <input value="{{ m.token }}" readonly onclick="this.select()" style="font-family:ui-monospace,monospace;font-size:13px">
+  </div>
+</div>
+{% endblock %}
