@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% block refresh %}<meta http-equiv="refresh" content="30">{% endblock %}
+{% block titulo %}{{ m.nome }} · Painel{% endblock %}
+{% block conteudo %}
+{% macro cor(v) %}{{ 'var(--fraco)' if v is none else ('var(--verde)' if v >= 0.85 else ('var(--amarelo)' if v >= 0.65 else 'var(--vermelho)')) }}{% endmacro %}
+<style>
+  .periodo { display:flex; gap:4px; background:var(--sup); border:1px solid var(--borda); border-radius:12px; padding:4px; }
+  .periodo a { padding:7px 12px; border-radius:9px; color:var(--fraco); font-weight:600; font-size:14px; }
+  .periodo a.on { background:var(--sup2); color:var(--texto); }
+  .linha1 { display:grid; gap:14px; grid-template-columns:260px repeat(3,1fr); }
+  .duas { display:grid; gap:14px; grid-template-columns:1.3fr 1fr; }
+  .anel { display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .barras { display:flex; align-items:flex-end; gap:3px; height:140px; }
+  .barras div { flex:1; background:linear-gradient(180deg,var(--laranja),rgba(255,138,61,.45)); border-radius:4px 4px 0 0; min-height:2px; }
+  .eixo { display:flex; gap:3px; margin-top:6px; }
+  .eixo span { flex:1; font-size:11px; color:var(--fraco); text-align:center; white-space:nowrap; overflow:visible; }
+  .pareto div.item { margin-bottom:12px; }
+  .pareto .topo2 { display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px; }
+  @media (max-width: 980px) { .linha1 { grid-template-columns:1fr 1fr; } .duas { grid-template-columns:1fr; } }
+</style>
+
+<div class="topo">
+  <div>
+    <h1>{{ m.nome }} {% if ultima %}<span class="selo {{ ultima.estado }}" style="vertical-align:middle">{{ ultima.estado }}</span>{% endif %}</h1>
+    <div class="sub">{{ m.tipo }} · ciclo padrão {{ m.ciclo_padrao_seg|round(1) }} s · última leitura {{ ultima.data_hora|hora if ultima else '—' }}</div>
+  </div>
+  <div class="periodo">
+    {% for h, rot in [(1, '1 h'), (8, 'Turno 8 h'), (24, '24 h'), (168, '7 dias')] %}
+    <a href="?horas={{ h }}" class="{{ 'on' if h == horas }}">{{ rot }}</a>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="linha1">
+  <div class="cartao anel">
+    {% set c = 326.7 %}{% set v = ind.oee or 0 %}
+    <svg width="150" height="150" viewBox="0 0 130 130" role="img" aria-label="OEE {{ ind.oee|pct }}">
+      <circle cx="65" cy="65" r="52" fill="none" stroke="var(--sup2)" stroke-width="12"/>
+      <circle cx="65" cy="65" r="52" fill="none" stroke="{{ cor(ind.oee) }}" stroke-width="12" stroke-linecap="round"
+              stroke-dasharray="{{ (v * c)|round(1) }} {{ c }}" transform="rotate(-90 65 65)"/>
+      <text x="65" y="66" text-anchor="middle" fill="var(--texto)" font-size="24" font-weight="700">{{ ind.oee|pct }}</text>
+      <text x="65" y="86" text-anchor="middle" fill="var(--fraco)" font-size="12">OEE</text>
+    </svg>
+    <div class="fraco">Meta de referência: 85%</div>
+  </div>
+  {% for nome, valor, det in [('Disponibilidade', ind.disponibilidade, ind.parado_min|duracao ~ ' parada não planejada'),
+                              ('Performance', ind.performance, ind.pecas ~ ' peças no período'),
+                              ('Qualidade', ind.qualidade, ind.refugo ~ ' peças refugadas')] %}
+  <div class="cartao kpi">
+    <div class="rot">{{ nome }}</div>
+    <div class="val">{{ valor|pct }}</div>
+    <div class="barra" style="margin:12px 0 10px"><div style="width:{{ ((valor or 0) * 100)|round(1) }}%;background:{{ cor(valor) }}"></div></div>
+    <div class="fraco">{{ det }}</div>
+  </div>
+  {% endfor %}
+</div>
+
+<h2>Linha do tempo</h2>
+<div class="cartao">
+  <div class="faixa" style="height:22px;border-radius:8px">
+    {% for f in faixa %}<span class="t-{{ f.tipo }}" style="left:{{ f.x }}%;width:{{ f.w }}%"></span>{% endfor %}
+  </div>
+  <div style="display:flex;justify-content:space-between;margin-top:8px" class="fraco">
+    <span>{{ inicio.strftime('%d/%m %H:%M') }}</span><span>agora</span>
+  </div>
+  <div class="legenda"><span><i style="background:var(--verde)"></i>Rodando</span><span><i class="t-naoplanejada"></i>Parada não planejada</span><span><i class="t-planejada"></i>Parada planejada</span><span><i class="t-semmotivo"></i>Sem motivo informado</span></div>
+</div>
+
+<div class="duas">
+  <div>
+    <h2>Produção por hora</h2>
+    <div class="cartao">
+      <div class="barras">{% for x in producao %}<div style="height:{{ x.altura }}%" title="{{ x.rotulo }}: {{ x.valor }} peças"></div>{% endfor %}</div>
+      <div class="eixo">{% for x in producao %}<span>{{ x.rotulo if x.mostrar }}</span>{% endfor %}</div>
+    </div>
+  </div>
+  <div>
+    <h2>Tempo parado por motivo</h2>
+    <div class="cartao pareto">
+      {% for x in motivos[:6] %}
+      <div class="item">
+        <div class="topo2"><span>{{ x.motivo }}</span><span class="fraco">{{ x.min|duracao }}</span></div>
+        <div class="barra"><div class="t-{{ x.tipo }}" style="width:{{ x.largura }}%"></div></div>
+      </div>
+      {% else %}<p class="fraco">Nenhuma parada no período.</p>{% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="duas">
+  <div>
+    <h2>Temperatura</h2>
+    <div class="cartao">
+      {% if temp %}
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+        <span style="font-size:22px;font-weight:700">{{ temp.atual|round(1) }} °C</span>
+        <span class="fraco">mín. {{ temp.menor|round(1) }} · máx. {{ temp.maior|round(1) }}{% if m.temp_max %} · limite {{ m.temp_max|round(0)|int }} °C{% endif %}</span>
+      </div>
+      <svg viewBox="0 0 {{ temp.largura }} {{ temp.altura }}" width="100%" height="110" preserveAspectRatio="none" role="img" aria-label="Temperatura no período">
+        {% if temp.y_max is not none %}<line x1="0" x2="{{ temp.largura }}" y1="{{ temp.y_max }}" y2="{{ temp.y_max }}" stroke="var(--vermelho)" stroke-dasharray="6 5" stroke-width="1.5" vector-effect="non-scaling-stroke"/>{% endif %}
+        <polyline points="{{ temp.pontos }}" fill="none" stroke="var(--azul)" stroke-width="2" vector-effect="non-scaling-stroke"/>
+      </svg>
+      {% else %}<p class="fraco">Sem leituras de temperatura no período.</p>{% endif %}
+    </div>
+  </div>
+  <div>
+    <h2>Alertas abertos</h2>
+    <div class="cartao">
+      {% for a in alertas %}
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;{{ 'border-top:1px solid var(--borda);padding-top:12px;margin-top:12px' if not loop.first }}">
+        <div><span class="selo aviso">{{ 'parada' if a.tipo == 'parada_sem_motivo' else 'temperatura' }}</span>
+          <div style="margin-top:6px">{{ a.mensagem }}</div><div class="fraco">{{ a.criado_em|hora }}</div></div>
+        <form method="post" action="{{ url_for('resolver_alerta', aid=a.id) }}"><button class="sec">Resolver</button></form>
+      </div>
+      {% else %}<p class="fraco" style="margin:0">Nenhum alerta aberto. Tudo certo por aqui.</p>{% endfor %}
+    </div>
+  </div>
+</div>
+
+<h2>Paradas no período ({{ paradas|length }})</h2>
+<div class="cartao" style="padding:6px 12px">
+<table>
+  <tr><th>Início</th><th>Duração</th><th>Motivo</th><th>Informado por</th></tr>
+  {% for p in paradas[:15] %}
+  <tr><td>{{ p.inicio|hora }}</td>
+      <td>{% if p.fim %}{{ ((p.fim|minutos_desde) - (p.inicio|minutos_desde))|abs|duracao }}{% else %}<span class="selo parada">em andamento</span>{% endif %}</td>
+      <td>{% if p.motivo %}{{ p.motivo }}{% if p.planejada %} <span class="fraco">· planejada</span>{% endif %}{% else %}<span class="selo aviso">sem motivo</span>{% endif %}</td>
+      <td>{{ p.quem or '—' }}</td></tr>
+  {% else %}<tr><td colspan="4" class="fraco">Nenhuma parada no período.</td></tr>{% endfor %}
+</table>
+{% if paradas|length > 15 %}<p class="fraco">Mostrando as 15 mais recentes.</p>{% endif %}
+</div>
+{% endblock %}
