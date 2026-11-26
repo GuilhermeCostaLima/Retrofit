@@ -97,6 +97,7 @@ docs/                   diagramas, prints das telas e protótipo navegável
 
 ## Documentação
 
+- **Documento da entrega técnica (PDF):** [`docs/Retrofit_Entrega_Tecnica.pdf`](docs/Retrofit_Entrega_Tecnica.pdf)
 - Diagrama de casos de uso: [`docs/diagramas/casos_uso.png`](docs/diagramas/casos_uso.png)
 - MER: [`docs/diagramas/mer.png`](docs/diagramas/mer.png)
 - Diagrama de tabelas: [`docs/diagramas/tabelas.png`](docs/diagramas/tabelas.png)
