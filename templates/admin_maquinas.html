@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block titulo %}Cadastro de máquinas · Retrofit{% endblock %}
+{% block conteudo %}
+<div class="topo"><div><h1>Cadastro de máquinas</h1><div class="sub">Cada máquina recebe um token para a peça e um QR code para o operador.</div></div></div>
+<div style="display:grid;gap:14px;grid-template-columns:minmax(280px,380px) 1fr;align-items:start" class="cad">
+  <form method="post" class="cartao">
+    <strong>Nova máquina</strong>
+    <label for="nome">Nome</label><input id="nome" name="nome" placeholder="Ex.: Torno 08" required>
+    <label for="tipo">Tipo</label><input id="tipo" name="tipo" placeholder="Torno, injetora, prensa..." required>
+    <label for="ciclo">Tempo de ciclo padrão (segundos por peça)</label><input id="ciclo" name="ciclo_padrao_seg" type="number" step="0.1" min="0.1" required>
+    <label for="tmax">Temperatura máxima (°C, opcional)</label><input id="tmax" name="temp_max" type="number" step="0.1">
+    <p style="margin-bottom:0"><button type="submit" style="width:100%">Cadastrar e gerar QR code</button></p>
+  </form>
+  <div class="cartao" style="padding:6px 12px">
+    <table>
+      <tr><th>Nome</th><th>Tipo</th><th>Ciclo</th><th>Temp. máx.</th><th>Situação</th></tr>
+      {% for m in maquinas %}
+      <tr><td><a href="{{ url_for('admin_maquina', mid=m.id) }}">{{ m.nome }}</a></td><td>{{ m.tipo }}</td>
+          <td>{{ m.ciclo_padrao_seg|round(1) }} s</td><td>{{ (m.temp_max|round(0)|int ~ ' °C') if m.temp_max is not none else '—' }}</td>
+          <td><span class="selo {{ 'rodando' if m.ativa else 'semsinal' }}">{{ 'ativa' if m.ativa else 'inativa' }}</span></td></tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+<style>@media (max-width: 820px) { .cad { grid-template-columns:1fr !important; } }</style>
+{% endblock %}
