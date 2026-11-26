@@ -1,0 +1,23 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.18, pytest-9.1.1, pluggy-1.6.0 
+rootdir: retrofit
+plugins: platformdirs-4.13.5, anyio-4.15.1
+collecting ... collected 15 items
+
+tests/test_app.py::test_ct01_login_valido PASSED                         [  6%]
+tests/test_app.py::test_ct02_login_senha_errada PASSED                   [ 13%]
+tests/test_app.py::test_ct03_operador_nao_acessa_admin PASSED            [ 20%]
+tests/test_app.py::test_ct04_email_duplicado_recusado PASSED             [ 26%]
+tests/test_app.py::test_ct05_senha_curta_recusada PASSED                 [ 33%]
+tests/test_app.py::test_ct06_maquina_ciclo_zero_recusada PASSED          [ 40%]
+tests/test_app.py::test_ct07_leitura_token_invalido PASSED               [ 46%]
+tests/test_app.py::test_ct08_parada_abre_parada_e_alerta PASSED          [ 53%]
+tests/test_app.py::test_ct09_segunda_leitura_parada_nao_duplica PASSED   [ 60%]
+tests/test_app.py::test_ct10_rodando_fecha_parada PASSED                 [ 66%]
+tests/test_app.py::test_ct11_motivo_resolve_alerta PASSED                [ 73%]
+tests/test_app.py::test_ct12_refugo_maior_que_produzido PASSED           [ 80%]
+tests/test_app.py::test_ct13_temperatura_gera_um_alerta PASSED           [ 86%]
+tests/test_app.py::test_ct14_usuario_de_outra_fabrica PASSED             [ 93%]
+tests/test_app.py::test_ct15_calculo_oee PASSED                          [100%]
+
+============================== 15 passed in 5.86s ==============================
