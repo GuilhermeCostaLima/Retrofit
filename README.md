@@ -9,9 +9,27 @@ Trabalho final de TAND (Tópicos Avançados em Negócios Digitais), Univille, 20
 
 ![Visão geral das máquinas](docs/telas/02_maquinas.png)
 
-| Painel do gestor | Tela do operador (celular) |
+## A peça Retrofit
+
+Uma peça única, sem tela, instalada na máquina antiga. Ela assume o comando, lê os sensores e manda os dados para a nuvem, de onde chegam no celular do operador e no PC do gestor. As imagens são do [protótipo 3D interativo](https://claude.ai/artifact/UhJWyTNboJ5hBtQx7GFg3c).
+
+| A peça na máquina | Por dentro | Dos sensores para a nuvem |
+| --- | --- | --- |
+| ![Peça Retrofit instalada](docs/peca/01_peca_retrofit.jpg) | ![Peça Retrofit por dentro](docs/peca/02_peca_por_dentro.jpg) | ![Fluxo dos dados para a nuvem](docs/peca/03_fluxo_nuvem.jpg) |
+
+## Telas
+
+| Login com entrada de um clique (demo) | Visão geral no celular |
 | --- | --- |
+| ![Login](docs/telas/01_login.png) | ![Visão geral no celular](docs/telas/08_maquinas_celular.png) |
+| **Painel do gestor** | **Tela do operador (QR code)** |
 | ![Painel](docs/telas/03_painel.png) | ![Operador](docs/telas/04_operador_celular.png) |
+| **Cadastro de máquinas** | **Máquina com token e QR code** |
+| ![Cadastro de máquinas](docs/telas/05_admin_maquinas.png) | ![Máquina com QR code](docs/telas/06_admin_maquina_qr.png) |
+| **Usuários** | |
+| ![Usuários](docs/telas/07_admin_usuarios.png) | |
+
+Todas as telas mostram dados fictícios do modo demonstração.
 
 ## Demonstração rápida (dados fictícios)
 
@@ -94,6 +112,20 @@ simulador.py            simulador da peça Retrofit (envia pela API)
 tests/test_app.py       casos de teste
 docs/                   diagramas, prints das telas e protótipo navegável
 ```
+
+## Diagramas
+
+### Casos de uso
+
+![Diagrama de casos de uso](docs/diagramas/casos_uso.png)
+
+### Modelo Entidade-Relacionamento (MER)
+
+![MER](docs/diagramas/mer.png)
+
+### Tabelas do banco (PK e FK)
+
+![Diagrama de tabelas](docs/diagramas/tabelas.png)
 
 ## Documentação
 
